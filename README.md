@@ -1,4 +1,4 @@
-
+# RxLogin
 RxLogin is an Android library that simplifies the process of login different types of services into a single observable.
 
 Current Supported Services:<br/>
@@ -71,8 +71,9 @@ And then just subscribe the observables:
         });
 ```
 ###Adding Library
+-----
 
-you just add the following dependency to your build.gradle:
+You just add the following dependency to your build.gradle:
 
 ```groovy
  dependencies {
