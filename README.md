@@ -70,7 +70,7 @@ And then just subscribe the observables:
             }
         });
 ```
-###Adding Library
+Adding Library
 -----
 
 You just add the following dependency to your build.gradle:
