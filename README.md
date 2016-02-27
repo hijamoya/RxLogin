@@ -70,5 +70,18 @@ And then just subscribe the observables:
             }
         });
 ```
+###Adding Library
+
+you just add the following dependency to your build.gradle:
+
+```groovy
+ dependencies {
+    repositories {
+         maven { url "http://dl.bintray.com/hijamoya/maven" }
+    }
+    compile 'com.hijamoya.rxlogin:library:0.0.1@aar'
+  }
+```
+
 
 -----

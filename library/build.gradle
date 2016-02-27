@@ -58,3 +58,30 @@ task checkstyle(type: Checkstyle) {
     classpath = files()
 }
 
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'RxLogin'
+
+    publishedGroupId = 'com.hijamoya.rxlogin'
+    libraryName = 'RxLogin'
+    artifact = 'library'
+
+    libraryDescription = 'RxLogin is an Android library that simplifies the process of login different types of services into a single observable.'
+
+    siteUrl = 'https://github.com/hijamoya/RxLogin'
+    gitUrl = 'https://github.com/hijamoya/RxLogin.git'
+
+    libraryVersion = '0.0.1'
+
+    developerId = 'hijamoya'
+    developerName = 'Jam Hsu'
+    developerEmail = 'hijamoya2004@hotmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+
