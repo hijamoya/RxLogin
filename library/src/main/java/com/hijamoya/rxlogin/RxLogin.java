@@ -86,22 +86,31 @@ public class RxLogin {
                         .build())
                 .build();
         }
-        return Async.fromCallable(() -> mGoogleApiClient.blockingConnect(
-            GOOGLE_API_CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS), Schedulers.io())
-            .flatMap(connectionResult -> {
-                if (!connectionResult.isSuccess()) {
-                    return Observable.error(new LoginException(LoginException.GOOGLE_ERROR,
-                        connectionResult.getErrorCode(), connectionResult.getErrorMessage()));
-                }
-                return Observable.create(new GoogleSubscriber(this));
-            })
-            .doOnSubscribe(() -> activity.startActivityForResult(getGoogleSingInIntent(),
-                RC_SIGN_IN))
-            .doOnUnsubscribe(() -> {
-                mGoogleApiClient.disconnect();
-                mGoogleApiClient = null;
-                mGoogleCallback = null;
-            });
+        return googleObservable(activity);
+    }
+
+    /**
+     * Login google to get the {@link GoogleSignInResult}.
+     *
+     * @param activity    the activity which is starting the login process
+     * @param scope       the requested scope
+     * @param scopes      the requested scopes
+     * @param webClientId the web client id you want to auth the token
+     * @return the {@link Observable} of {@link GoogleSignInResult} of this login process
+     */
+    public Observable<GoogleSignInResult> loginGoogle(Activity activity, @NonNull String
+        webClientId, @NonNull Scope scope, Scope... scopes) {
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(activity.getApplicationContext())
+                .addApi(Auth.GOOGLE_SIGN_IN_API,
+                    new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestEmail()
+                        .requestScopes(scope, scopes)
+                        .requestServerAuthCode(webClientId, true)
+                        .build())
+                .build();
+        }
+        return googleObservable(activity);
     }
 
     /**
@@ -131,9 +140,9 @@ public class RxLogin {
      * @param resultCode  the result code that's received by the Activity or Fragment
      * @param data        the result data that's received by the Activity or Fragment
      */
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         if (mCallbackManager != null) {
-            mCallbackManager.onActivityResult(requestCode, resultCode, data);
+            return mCallbackManager.onActivityResult(requestCode, resultCode, data);
         }
         if (mGoogleCallback != null) {
             if (requestCode == RC_SIGN_IN) {
@@ -148,7 +157,9 @@ public class RxLogin {
                     }
                 }
             }
+            return true;
         }
+        return false;
     }
 
     @VisibleForTesting Intent getGoogleSingInIntent() {
@@ -156,6 +167,25 @@ public class RxLogin {
             return null;
         }
         return Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+    }
+
+    private Observable<GoogleSignInResult> googleObservable(Activity activity) {
+        return Async.fromCallable(() -> mGoogleApiClient.blockingConnect(
+            GOOGLE_API_CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS), Schedulers.io())
+            .flatMap(connectionResult -> {
+                if (!connectionResult.isSuccess()) {
+                    return Observable.error(new LoginException(LoginException.GOOGLE_ERROR,
+                        connectionResult.getErrorCode(), connectionResult.getErrorMessage()));
+                }
+                return Observable.create(new GoogleSubscriber(this));
+            })
+            .doOnSubscribe(() -> activity.startActivityForResult(getGoogleSingInIntent(),
+                RC_SIGN_IN))
+            .doOnUnsubscribe(() -> {
+                mGoogleApiClient.disconnect();
+                mGoogleApiClient = null;
+                mGoogleCallback = null;
+            });
     }
 
 }
