@@ -22,7 +22,7 @@ For google login, you should follow the page to finish settings:
 https://developers.google.com/identity/sign-in/android/start-integrating
 ```
 
-In your Activity's ```onCreate()```, put RxLogin to your Acitivity's ```onActivityResult```:
+Put RxLogin to your Acitivity's ```onActivityResult```:
 
 ```java
  @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -50,7 +50,7 @@ And then just subscribe the observables:
                     });
             }
         });
-        findViewById(R.id.btn_login_facebook).setOnClickListener(new View
+ findViewById(R.id.btn_login_facebook).setOnClickListener(new View
             .OnClickListener() {
             @Override public void onClick(View v) {
                 mRxLogin.loginFacebook(MainActivity.this, false, Arrays.asList(
