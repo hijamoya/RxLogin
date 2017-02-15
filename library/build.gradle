@@ -65,7 +65,7 @@ ext {
     libraryName = 'RxLogin'
     artifact = 'library'
 
-    libraryDescription = 'RxLogin is an Android library that simplifies the process of login different types of services into a single observable.'
+    libraryDescription = 'RxLogin is an Android library that simplifies the process of login different types of services into a single Flowable (Observable).'
 
     siteUrl = 'https://github.com/hijamoya/RxLogin'
     gitUrl = 'https://github.com/hijamoya/RxLogin.git'
