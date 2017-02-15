@@ -31,7 +31,7 @@ Put RxLogin to your Acitivity's ```onActivityResult```:
  }
 ```
 
-And then just subscribe the observables:
+And then just subscribe the Flowable (Observable):
 
 ```java
 findViewById(R.id.btn_login_google).setOnClickListener(new View
