@@ -3,6 +3,7 @@ package com.hijamoya.rxlogin.sample;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 import com.facebook.login.LoginResult;
@@ -13,8 +14,8 @@ import com.hijamoya.rxlogin.RxLogin;
 
 import java.util.Arrays;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,13 +30,16 @@ public class MainActivity extends AppCompatActivity {
             @Override public void onClick(View v) {
                 mRxLogin.loginGoogle(MainActivity.this, new Scope(Scopes.PLUS_LOGIN))
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Action1<GoogleSignInResult>() {
-                        @Override public void call(GoogleSignInResult result) {
+                    .subscribe(new Consumer<GoogleSignInResult>() {
+                        @Override
+                        public void accept(GoogleSignInResult googleSignInResult) throws Exception {
                             // login success
+                            Log.e("option", googleSignInResult.getSignInAccount().getDisplayName());
                         }
-                    }, new Action1<Throwable>() {
-                        @Override public void call(Throwable throwable) {
+                    }, new Consumer<Throwable>() {
+                        @Override public void accept(Throwable throwable) throws Exception {
                             // login fail
+                            Log.e("option", "gg", throwable);
                         }
                     });
             }
@@ -48,12 +52,12 @@ public class MainActivity extends AppCompatActivity {
                     "email",
                     "user_friends"))
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Action1<LoginResult>() {
-                        @Override public void call(LoginResult result) {
+                    .subscribe(new Consumer<LoginResult>() {
+                        @Override public void accept(LoginResult loginResult) throws Exception {
                             // login success
                         }
-                    }, new Action1<Throwable>() {
-                        @Override public void call(Throwable throwable) {
+                    }, new Consumer<Throwable>() {
+                        @Override public void accept(Throwable throwable) throws Exception {
                             // login fail
                         }
                     });

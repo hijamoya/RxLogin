@@ -8,10 +8,10 @@ import com.hijamoya.rxlogin.GoogleCallback;
 import com.hijamoya.rxlogin.LoginException;
 import com.hijamoya.rxlogin.RxLogin;
 
-import rx.Observable;
-import rx.Subscriber;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
 
-public class GoogleSubscriber implements Observable.OnSubscribe<GoogleSignInResult> {
+public class GoogleSubscriber implements FlowableOnSubscribe<GoogleSignInResult> {
 
     private final RxLogin mRxLogin;
 
@@ -21,25 +21,25 @@ public class GoogleSubscriber implements Observable.OnSubscribe<GoogleSignInResu
         this.mRxLogin = rxLogin;
     }
 
-    @Override public void call(final Subscriber<? super GoogleSignInResult> subscriber) {
+    @Override public void subscribe(FlowableEmitter<GoogleSignInResult> emitter) throws Exception {
         mCallback = new GoogleCallback() {
             @Override public void onSuccess(GoogleSignInResult result) {
-                if (!subscriber.isUnsubscribed()) {
-                    subscriber.onNext(result);
-                    subscriber.onCompleted();
+                if (!emitter.isCancelled()) {
+                    emitter.onNext(result);
+                    emitter.onComplete();
                 }
             }
 
             @Override public void onCancel() {
-                if (!subscriber.isUnsubscribed()) {
-                    subscriber.onError(new LoginException(LoginException.LOGIN_CANCELED));
+                if (!emitter.isCancelled()) {
+                    emitter.onError(new LoginException(LoginException.LOGIN_CANCELED));
                 }
             }
 
             @Override public void onError(GoogleSignInResult result) {
-                if (!subscriber.isUnsubscribed()) {
+                if (!emitter.isCancelled()) {
                     Status status = result.getStatus();
-                    subscriber.onError(new LoginException(LoginException.GOOGLE_ERROR,
+                    emitter.onError(new LoginException(LoginException.GOOGLE_ERROR,
                         status.getStatusCode(), status.getStatusMessage()));
                 }
             }

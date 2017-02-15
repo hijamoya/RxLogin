@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import rx.observers.TestSubscriber;
+import io.reactivex.subscribers.TestSubscriber;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +44,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-@Config(sdk = LOLLIPOP, constants = BuildConfig.class)
+@Config(sdk = LOLLIPOP, constants = BuildConfig.class, manifest=Config.NONE)
 @RunWith(ParameterizedRobolectricTestRunner.class)
 public class RxLoginTest {
 
@@ -131,7 +131,7 @@ public class RxLoginTest {
         }
         mFacebookSubscriber.assertNoErrors();
         mFacebookSubscriber.assertValueCount(1);
-        mFacebookSubscriber.assertTerminalEvent();
+        mFacebookSubscriber.assertTerminated();
         assertThat(mRxLogin.mFbManager).isNull();
         assertThat(mRxLogin.mFacebookCallback).isNull();
         assertThat(mRxLogin.mCallbackManager).isNull();
@@ -165,7 +165,7 @@ public class RxLoginTest {
                     "user_friends")));
         }
         mFacebookSubscriber.assertError(LoginException.class);
-        mFacebookSubscriber.assertTerminalEvent();
+        mFacebookSubscriber.assertTerminated();
         assertThat(mRxLogin.mFbManager).isNull();
         assertThat(mRxLogin.mFacebookCallback).isNull();
         assertThat(mRxLogin.mCallbackManager).isNull();
@@ -199,7 +199,7 @@ public class RxLoginTest {
                     "user_friends")));
         }
         mFacebookSubscriber.assertError(LoginException.class);
-        mFacebookSubscriber.assertTerminalEvent();
+        mFacebookSubscriber.assertTerminated();
         assertThat(mRxLogin.mFbManager).isNull();
         assertThat(mRxLogin.mFacebookCallback).isNull();
         assertThat(mRxLogin.mCallbackManager).isNull();
@@ -219,7 +219,7 @@ public class RxLoginTest {
         inOrder.verify(mMockGoogleApiClient).disconnect();
         mGoogleSubscriber.assertNoErrors();
         mGoogleSubscriber.assertValueCount(1);
-        mGoogleSubscriber.assertTerminalEvent();
+        mGoogleSubscriber.assertTerminated();
         assertThat(mRxLogin.mGoogleApiClient).isNull();
         assertThat(mRxLogin.mGoogleCallback).isNull();
     }
@@ -237,7 +237,7 @@ public class RxLoginTest {
         inOrder.verify(mMockGoogleApiClient).blockingConnect(eq(10L), eq(TimeUnit.SECONDS));
         inOrder.verify(mMockGoogleApiClient).disconnect();
         mGoogleSubscriber.assertError(LoginException.class);
-        mGoogleSubscriber.assertTerminalEvent();
+        mGoogleSubscriber.assertTerminated();
         assertThat(mRxLogin.mGoogleApiClient).isNull();
         assertThat(mRxLogin.mGoogleCallback).isNull();
     }
@@ -255,7 +255,7 @@ public class RxLoginTest {
         inOrder.verify(mMockGoogleApiClient).blockingConnect(eq(10L), eq(TimeUnit.SECONDS));
         inOrder.verify(mMockGoogleApiClient).disconnect();
         mGoogleSubscriber.assertError(LoginException.class);
-        mGoogleSubscriber.assertTerminalEvent();
+        mGoogleSubscriber.assertTerminated();
         assertThat(mRxLogin.mGoogleApiClient).isNull();
         assertThat(mRxLogin.mGoogleCallback).isNull();
     }
@@ -272,7 +272,7 @@ public class RxLoginTest {
         inOrder.verify(mMockGoogleApiClient).blockingConnect(eq(10L), eq(TimeUnit.SECONDS));
         inOrder.verify(mMockGoogleApiClient).disconnect();
         mGoogleSubscriber.assertError(LoginException.class);
-        mGoogleSubscriber.assertTerminalEvent();
+        mGoogleSubscriber.assertTerminated();
         assertThat(mRxLogin.mGoogleApiClient).isNull();
         assertThat(mRxLogin.mGoogleCallback).isNull();
     }

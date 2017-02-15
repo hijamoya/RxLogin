@@ -8,10 +8,10 @@ import com.facebook.login.LoginResult;
 import com.hijamoya.rxlogin.LoginException;
 import com.hijamoya.rxlogin.RxLogin;
 
-import rx.Observable;
-import rx.Subscriber;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
 
-public class FacebookSubscriber implements Observable.OnSubscribe<LoginResult> {
+public class FacebookSubscriber implements FlowableOnSubscribe<LoginResult> {
 
     private final RxLogin mRxLogin;
 
@@ -21,24 +21,24 @@ public class FacebookSubscriber implements Observable.OnSubscribe<LoginResult> {
         this.mRxLogin = rxLogin;
     }
 
-    @Override public void call(final Subscriber<? super LoginResult> subscriber) {
+    @Override public void subscribe(FlowableEmitter<LoginResult> emitter) throws Exception {
         mCallback = new FacebookCallback<LoginResult>() {
             @Override public void onSuccess(LoginResult result) {
-                if (!subscriber.isUnsubscribed()) {
-                    subscriber.onNext(result);
-                    subscriber.onCompleted();
+                if (!emitter.isCancelled()) {
+                    emitter.onNext(result);
+                    emitter.onComplete();
                 }
             }
 
             @Override public void onCancel() {
-                if (!subscriber.isUnsubscribed()) {
-                    subscriber.onError(new LoginException(LoginException.LOGIN_CANCELED));
+                if (!emitter.isCancelled()) {
+                    emitter.onError(new LoginException(LoginException.LOGIN_CANCELED));
                 }
             }
 
             @Override public void onError(FacebookException error) {
-                if (!subscriber.isUnsubscribed()) {
-                    subscriber.onError(new LoginException(LoginException.FACEBOOK_ERROR, error));
+                if (!emitter.isCancelled()) {
+                    emitter.onError(new LoginException(LoginException.FACEBOOK_ERROR, error));
                 }
             }
         };

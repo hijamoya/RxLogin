@@ -12,100 +12,92 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import rx.observers.TestSubscriber;
+import io.reactivex.FlowableEmitter;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-@Config(sdk = LOLLIPOP, constants = BuildConfig.class)
-@RunWith(RobolectricGradleTestRunner.class)
+@Config(sdk = LOLLIPOP, constants = BuildConfig.class, manifest=Config.NONE)
+@RunWith(RobolectricTestRunner.class)
 public class GoogleSubscriberTest {
 
     @Mock RxLogin mRxLogin;
+    @Mock FlowableEmitter<GoogleSignInResult> mEmitter;
 
-    TestSubscriber<? super GoogleSignInResult> mSubscriber;
     GoogleSubscriber mGoogleSubscriber;
 
-    @Test public void testCallOnSuccess() {
+    @Test public void testCallOnSuccess() throws Exception {
         GoogleSignInResult result = mock(GoogleSignInResult.class);
         mGoogleSubscriber = new GoogleSubscriber(mRxLogin);
-        mGoogleSubscriber.call(mSubscriber);
+        mGoogleSubscriber.subscribe(mEmitter);
         verify(mRxLogin).registerCallback(eq(mGoogleSubscriber.mCallback));
         mGoogleSubscriber.mCallback.onSuccess(result);
-        mSubscriber.assertTerminalEvent();
-        mSubscriber.assertNoErrors();
-        mSubscriber.assertValueCount(1);
-        mSubscriber.assertCompleted();
-        assertThat(mSubscriber.getOnNextEvents().get(0)).isEqualTo(result);
+        verify(mEmitter).onNext(eq(result));
+        verify(mEmitter).onComplete();
     }
 
-    @Test public void testCallOnError() {
+    @Test public void testCallOnError() throws Exception {
         GoogleSignInResult result = mock(GoogleSignInResult.class);
         when(result.getStatus()).thenReturn(new Status(1300, "gg"));
         mGoogleSubscriber = new GoogleSubscriber(mRxLogin);
-        mGoogleSubscriber.call(mSubscriber);
+        mGoogleSubscriber.subscribe(mEmitter);
         verify(mRxLogin).registerCallback(eq(mGoogleSubscriber.mCallback));
         mGoogleSubscriber.mCallback.onError(result);
-        mSubscriber.assertError(LoginException.class);
-        assertThat(((LoginException) mSubscriber.getOnErrorEvents().get(0)).getErrorCode())
-            .isEqualTo(LoginException.GOOGLE_ERROR);
-        assertThat(((LoginException) mSubscriber.getOnErrorEvents().get(0)).getStatusCode())
-            .isEqualTo(1300);
-        assertThat((mSubscriber.getOnErrorEvents().get(0)).getMessage()).isEqualTo("gg");
+        verify(mEmitter).onError(any(LoginException.class));
     }
 
-    @Test public void testCallWithOnCancel() {
-        mGoogleSubscriber.call(mSubscriber);
+    @Test public void testCallWithOnCancel() throws Exception {
+        mGoogleSubscriber.subscribe(mEmitter);
         verify(mRxLogin).registerCallback(eq(mGoogleSubscriber.mCallback));
         mGoogleSubscriber.mCallback.onCancel();
-        mSubscriber.assertError(LoginException.class);
-        assertThat(((LoginException) mSubscriber.getOnErrorEvents().get(0)).getErrorCode())
-            .isEqualTo(LoginException.LOGIN_CANCELED);
+        verify(mEmitter).onError(any(LoginException.class));
     }
 
-    @Test public void testUnsubscribeWhenSuccess() {
-        mGoogleSubscriber.call(mSubscriber);
-        mSubscriber.unsubscribe();
+    @Test public void testCancelWhenSuccess() throws Exception {
+        mGoogleSubscriber.subscribe(mEmitter);
+        when(mEmitter.isCancelled()).thenReturn(true);
         mGoogleSubscriber.mCallback.onSuccess(mock(GoogleSignInResult.class));
-        mSubscriber.assertNoValues();
-        mSubscriber.assertNotCompleted();
-        mSubscriber.assertNoTerminalEvent();
+        verify(mEmitter, never()).onError(any(Throwable.class));
+        verify(mEmitter, never()).onNext(any(GoogleSignInResult.class));
+        verify(mEmitter, never()).onComplete();
     }
 
-    @Test public void testUnsubscribeWhenError() {
-        mGoogleSubscriber.call(mSubscriber);
-        mSubscriber.unsubscribe();
+    @Test public void testCancelWhenError() throws Exception {
+        mGoogleSubscriber.subscribe(mEmitter);
+        when(mEmitter.isCancelled()).thenReturn(true);
         mGoogleSubscriber.mCallback.onError(mock(GoogleSignInResult.class));
-        mSubscriber.assertNoErrors();
-        mSubscriber.assertNoTerminalEvent();
+        verify(mEmitter, never()).onError(any(Throwable.class));
+        verify(mEmitter, never()).onNext(any(GoogleSignInResult.class));
+        verify(mEmitter, never()).onComplete();
     }
 
-    @Test public void testUnsubscribeWhenCancel() {
-        mGoogleSubscriber.call(mSubscriber);
-        mSubscriber.unsubscribe();
+    @Test public void testCancelWhenCancel() throws Exception {
+        mGoogleSubscriber.subscribe(mEmitter);
+        when(mEmitter.isCancelled()).thenReturn(true);
         mGoogleSubscriber.mCallback.onCancel();
-        mSubscriber.assertNoErrors();
-        mSubscriber.assertNoTerminalEvent();
+        verify(mEmitter, never()).onError(any(Throwable.class));
+        verify(mEmitter, never()).onNext(any(GoogleSignInResult.class));
+        verify(mEmitter, never()).onComplete();
     }
 
     @Before public void setUp() throws Exception {
         initMocks(this);
-        mSubscriber = new TestSubscriber<>();
         mGoogleSubscriber = new GoogleSubscriber(mRxLogin);
     }
 
     @After public void tearDown() throws Exception {
         mRxLogin = null;
         mGoogleSubscriber = null;
-        mSubscriber = null;
+        mEmitter = null;
     }
 
 }
