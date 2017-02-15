@@ -77,8 +77,8 @@ Adding Library
 -----
 
 You just add the following dependency to your build.gradle:
-Rxjava:
 ```groovy
+Rxjava:
  dependencies {
     repositories {
          maven { url 'http://dl.bintray.com/hijamoya/maven' }
@@ -86,14 +86,15 @@ Rxjava:
     compile 'com.hijamoya.rxlogin:library:0.0.2@aar'
   }
 ```
-Rxjava2:
 ```groovy
+Rxjava2:
  dependencies {
     repositories {
          maven { url 'http://dl.bintray.com/hijamoya/maven' }
     }
     compile 'com.hijamoya.rxlogin:library:0.1.0@aar'
   }
+
 License
 -----
     Copyright 2016 Jam Hsu
