@@ -43,12 +43,10 @@ findViewById(R.id.btn_login_google).setOnClickListener(new View
                         @Override
                         public void accept(GoogleSignInResult googleSignInResult) throws Exception {
                             // login success
-                            Log.e("option", googleSignInResult.getSignInAccount().getDisplayName());
                         }
                     }, new Consumer<Throwable>() {
                         @Override public void accept(Throwable throwable) throws Exception {
                             // login fail
-                            Log.e("option", "gg", throwable);
                         }
                     });
             }
@@ -94,6 +92,7 @@ Rxjava2:
     }
     compile 'com.hijamoya.rxlogin:library:0.1.0@aar'
   }
+```
 
 License
 -----

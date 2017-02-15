@@ -3,7 +3,6 @@ package com.hijamoya.rxlogin.sample;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 
 import com.facebook.login.LoginResult;
@@ -34,12 +33,10 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void accept(GoogleSignInResult googleSignInResult) throws Exception {
                             // login success
-                            Log.e("option", googleSignInResult.getSignInAccount().getDisplayName());
                         }
                     }, new Consumer<Throwable>() {
                         @Override public void accept(Throwable throwable) throws Exception {
                             // login fail
-                            Log.e("option", "gg", throwable);
                         }
                     });
             }
