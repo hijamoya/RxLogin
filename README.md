@@ -90,7 +90,7 @@ Rxjava2:
     repositories {
          maven { url 'http://dl.bintray.com/hijamoya/maven' }
     }
-    compile 'com.hijamoya.rxlogin:library:0.1.0@aar'
+    compile 'com.hijamoya.rxlogin:library:0.1.1@aar'
   }
 ```
 

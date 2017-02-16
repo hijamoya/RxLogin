@@ -19,7 +19,7 @@ buildscript {
         classpath 'com.autoscout24.gradle:gradle-monkey-plugin:1.2'
         classpath 'me.tatarka:gradle-retrolambda:3.2.4'
         classpath 'me.tatarka.retrolambda.projectlombok:lombok.ast:0.2.3.a2'
-        classpath 'com.google.gms:google-services:2.0.0-alpha6'
+        classpath 'com.google.gms:google-services:3.0.0'
         classpath 'me.tatarka:gradle-retrolambda:3.2.4'
         classpath 'me.tatarka.retrolambda.projectlombok:lombok.ast:0.2.3.a2'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
