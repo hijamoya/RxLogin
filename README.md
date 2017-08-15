@@ -4,6 +4,7 @@ RxLogin is an Android library that simplifies the process of login different typ
 Current Supported Services:<br/>
 1. Facebook<br/>
 2. Google<br/>
+3. Twitter<br/>
 
 Usage
 -----
