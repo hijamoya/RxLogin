@@ -22,7 +22,14 @@ For google login, you should follow the page to finish settings:
 https://developers.google.com/identity/sign-in/android/start-integrating
 ```
 
-Put RxLogin to your Acitivity's ```onActivityResult```:
+For twitter login, you should follow the pages to finish settings:
+
+```java
+https://dev.twitter.com/twitterkit/android/installation
+https://dev.twitter.com/twitterkit/android/log-in-with-twitter
+```
+
+Put RxLogin to your Activity's ```onActivityResult```:
 
 ```java
  @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -61,6 +68,23 @@ findViewById(R.id.btn_login_facebook).setOnClickListener(new View
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<LoginResult>() {
                         @Override public void accept(LoginResult loginResult) throws Exception {
+                            // login success
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override public void accept(Throwable throwable) throws Exception {
+                            // login fail
+                        }
+                    });
+            }
+        });
+findViewById(R.id.btn_login_twitter).setOnClickListener(new View
+            .OnClickListener() {
+            @Override public void onClick(View v) {
+                mRxLogin.loginTwitter(MainActivity.this)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Result<TwitterSession>>() {
+                        @Override
+                        public void accept(Result<TwitterSession> result) throws Exception {
                             // login success
                         }
                     }, new Consumer<Throwable>() {

@@ -201,8 +201,7 @@ public class RxLogin {
     }
 
     private Flowable<GoogleSignInResult> googleObservable(Activity activity) {
-        return Flowable.create(
-            (FlowableOnSubscribe<ConnectionResult>) e -> {
+        return Flowable.create((FlowableOnSubscribe<ConnectionResult>) e -> {
                 e.onNext(mGoogleApiClient.blockingConnect(GOOGLE_API_CONNECTION_TIMEOUT_SECONDS,
                     TimeUnit.SECONDS));
                 e.onComplete();
