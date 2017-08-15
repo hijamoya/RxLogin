@@ -10,6 +10,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Scope;
 import com.hijamoya.rxlogin.RxLogin;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterSession;
 
 import java.util.Arrays;
 
@@ -51,6 +53,23 @@ public class MainActivity extends AppCompatActivity {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<LoginResult>() {
                         @Override public void accept(LoginResult loginResult) throws Exception {
+                            // login success
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override public void accept(Throwable throwable) throws Exception {
+                            // login fail
+                        }
+                    });
+            }
+        });
+        findViewById(R.id.btn_login_twitter).setOnClickListener(new View
+            .OnClickListener() {
+            @Override public void onClick(View v) {
+                mRxLogin.loginTwitter(MainActivity.this)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Result<TwitterSession>>() {
+                        @Override
+                        public void accept(Result<TwitterSession> result) throws Exception {
                             // login success
                         }
                     }, new Consumer<Throwable>() {

@@ -15,6 +15,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 import com.squareup.assertj.android.BuildConfig;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterAuthClient;
 
 import org.junit.After;
 import org.junit.Before;
@@ -53,9 +57,11 @@ public class RxLoginTest {
     @Mock GoogleSignInResult mGoogleSignInResult;
     @Mock Intent mTestIntent;
     @Mock GoogleApiClient mMockGoogleApiClient;
+    @Mock TwitterAuthClient mMockTwitterAuthClient;
 
     TestSubscriber<? super LoginResult> mFacebookSubscriber;
     TestSubscriber<? super GoogleSignInResult> mGoogleSubscriber;
+    TestSubscriber<? super Result<TwitterSession>> mTwitterSubscriber;
     RxLogin mRxLogin;
 
     private final boolean mPublish;
@@ -277,6 +283,24 @@ public class RxLoginTest {
         assertThat(mRxLogin.mGoogleCallback).isNull();
     }
 
+    @Test public void testLoginTwitterSuccess() {
+        Result<TwitterSession> result = mock(Result.class);
+        mRxLogin.mTwitterClient = mMockTwitterAuthClient;
+        mRxLogin.loginTwitter(mActivity).subscribe(mTwitterSubscriber);
+        mRxLogin.mTwitterCallback.success(result);
+        mTwitterSubscriber.awaitTerminalEvent();
+        mTwitterSubscriber.assertResult(result);
+        mTwitterSubscriber.assertComplete();
+    }
+
+    @Test public void testLoginTwitterError() {
+        mRxLogin.mTwitterClient = mMockTwitterAuthClient;
+        mRxLogin.loginTwitter(mActivity).subscribe(mTwitterSubscriber);
+        mRxLogin.mTwitterCallback.failure(mock(TwitterException.class));
+        mTwitterSubscriber.awaitTerminalEvent();
+        mTwitterSubscriber.assertError(LoginException.class);
+    }
+
     @Before public void setUp() throws Exception {
         initMocks(this);
         when(mActivity.getApplicationContext()).thenReturn(RuntimeEnvironment.application);
@@ -291,6 +315,7 @@ public class RxLoginTest {
             .thenReturn(new ConnectionResult(ConnectionResult.SUCCESS));
         mFacebookSubscriber = new TestSubscriber<>();
         mGoogleSubscriber = new TestSubscriber<>();
+        mTwitterSubscriber = new TestSubscriber<>();
         mRxLogin = spy(new RxLogin());
         when(mRxLogin.getGoogleSingInIntent()).thenReturn(mTestIntent);
     }

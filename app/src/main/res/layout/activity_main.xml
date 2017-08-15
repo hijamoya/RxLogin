@@ -20,4 +20,11 @@
         android:text="Login Google"
         android:layout_height="wrap_content" />
 
+    <Button
+        android:id="@+id/btn_login_twitter"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Login Twitter"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>

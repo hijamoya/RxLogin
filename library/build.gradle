@@ -3,12 +3,12 @@ apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'checkstyle'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 25
     buildToolsVersion "25.0.2"
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 25
     }
     buildTypes {
         release {
@@ -24,16 +24,19 @@ android {
 
 dependencies {
     // rxjava2
-    compile 'io.reactivex.rxjava2:rxjava:2.0.5'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.2'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
 
     // facebook sdk
-    compile('com.facebook.android:facebook-android-sdk:4.19.0@aar') {
+    compile('com.facebook.android:facebook-android-sdk:4.25.0@aar') {
         transitive = true
     }
 
     // google gms
     compile 'com.google.android.gms:play-services-auth:11.0.1'
+
+    // twitter
+    compile 'com.twitter.sdk.android:twitter-core:3.1.1'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:3.0'

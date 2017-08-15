@@ -16,15 +16,18 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.hijamoya.rxlogin.subscriber.FacebookSubscriber;
 import com.hijamoya.rxlogin.subscriber.GoogleSubscriber;
+import com.hijamoya.rxlogin.subscriber.TwitterSubscriber;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterAuthClient;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
-import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 
 public class RxLogin {
@@ -37,6 +40,8 @@ public class RxLogin {
     @VisibleForTesting com.facebook.CallbackManager mCallbackManager;
     @VisibleForTesting FacebookCallback<LoginResult> mFacebookCallback;
     @VisibleForTesting GoogleCallback mGoogleCallback;
+    @VisibleForTesting TwitterAuthClient mTwitterClient;
+    @VisibleForTesting Callback<TwitterSession> mTwitterCallback;
 
     /**
      * Login facebook to get the {@link LoginResult}.
@@ -44,7 +49,7 @@ public class RxLogin {
      * @param activity    the activity which is starting the login process
      * @param publish     need publish permission or not
      * @param permissions the requested permissions
-     * @return the {@link Observable} of {@link LoginResult} of this login process
+     * @return the {@link Flowable} of {@link LoginResult} of this login process
      */
     public Flowable<LoginResult> loginFacebook(Activity activity, boolean publish,
         List<String> permissions) {
@@ -73,7 +78,7 @@ public class RxLogin {
      * @param activity the activity which is starting the login process
      * @param scope    the requested scope
      * @param scopes   the requested scopes
-     * @return the {@link Observable} of {@link GoogleSignInResult} of this login process
+     * @return the {@link Flowable} of {@link GoogleSignInResult} of this login process
      */
     public Flowable<GoogleSignInResult> loginGoogle(Activity activity, @NonNull Scope scope,
         Scope... scopes) {
@@ -96,7 +101,7 @@ public class RxLogin {
      * @param scope       the requested scope
      * @param scopes      the requested scopes
      * @param webClientId the web client id you want to auth the token
-     * @return the {@link Observable} of {@link GoogleSignInResult} of this login process
+     * @return the {@link Flowable} of {@link GoogleSignInResult} of this login process
      */
     public Flowable<GoogleSignInResult> loginGoogle(Activity activity, @NonNull String
         webClientId, @NonNull Scope scope, Scope... scopes) {
@@ -111,6 +116,20 @@ public class RxLogin {
                 .build();
         }
         return googleObservable(activity);
+    }
+
+    /**
+     * Login twitter to get the {@link TwitterSession}.
+     *
+     * @param activity the activity which is starting the login process
+     * @return the {@link Flowable} of {@link TwitterSession} of this login process
+     */
+    public Flowable<Result<TwitterSession>> loginTwitter(Activity activity) {
+        if (mTwitterClient == null) {
+            mTwitterClient = new TwitterAuthClient();
+        }
+        return Flowable.create(new TwitterSubscriber(this, activity, mTwitterClient),
+            BackpressureStrategy.DROP);
     }
 
     /**
@@ -134,6 +153,15 @@ public class RxLogin {
     }
 
     /**
+     * Register the callback for twitter login.
+     *
+     * @param callback the callback for getting the result from twitter
+     */
+    public void registerCallback(Callback<TwitterSession> callback) {
+        mTwitterCallback = callback;
+    }
+
+    /**
      * The method that should be called from the Activity's or Fragment's onActivityResult method.
      *
      * @param requestCode the request code that's received by the Activity or Fragment
@@ -143,6 +171,9 @@ public class RxLogin {
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         if (mCallbackManager != null) {
             return mCallbackManager.onActivityResult(requestCode, resultCode, data);
+        }
+        if (mTwitterClient != null) {
+            mTwitterClient.onActivityResult(requestCode, resultCode, data);
         }
         if (mGoogleCallback != null) {
             if (requestCode == RC_SIGN_IN) {
@@ -171,13 +202,10 @@ public class RxLogin {
 
     private Flowable<GoogleSignInResult> googleObservable(Activity activity) {
         return Flowable.create(
-            new FlowableOnSubscribe<ConnectionResult>() {
-                @Override public void subscribe(FlowableEmitter
-                    <ConnectionResult> e) throws Exception {
-                    e.onNext(mGoogleApiClient.blockingConnect(GOOGLE_API_CONNECTION_TIMEOUT_SECONDS,
-                        TimeUnit.SECONDS));
-                    e.onComplete();
-                }
+            (FlowableOnSubscribe<ConnectionResult>) e -> {
+                e.onNext(mGoogleApiClient.blockingConnect(GOOGLE_API_CONNECTION_TIMEOUT_SECONDS,
+                    TimeUnit.SECONDS));
+                e.onComplete();
             },
             BackpressureStrategy.DROP)
             .subscribeOn(Schedulers.io())
