@@ -33,7 +33,7 @@ dependencies {
     }
 
     // google gms
-    compile 'com.google.android.gms:play-services-auth:11.0.1'
+    compile 'com.google.android.gms:play-services-auth:11.0.4'
 
     // twitter
     compile 'com.twitter.sdk.android:twitter-core:3.1.1'
